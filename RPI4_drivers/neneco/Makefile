@@ -22,6 +22,8 @@ INCLUDEPATH3 ?= ../mmu
 INCLUDEPATH4 ?= ../../FreeRTOS_port/include
 INCLUDEPATH5 ?= ../../FreeRTOS_port/portable/GCC/ARM_CA72_64_BIT
 
+BUILDPATH := ./build
+
 # From ./src
 OBJS = build/startup.o
 OBJS +=build/FreeRTOS_asm_vector.o
@@ -61,36 +63,39 @@ OBJS +=build/timers.o
 
 OBJS +=build/heap_4.o
 
-neneco.elf : src/raspberrypi4.ld $(OBJS)
-	$(CROSS)gcc -Wl,--build-id=none -std=gnu99 -T src/raspberrypi4.ld -o $@ -ffreestanding -nostdlib --specs=nosys.specs $(BUILTIN_OPS) $(OBJS)
+neneco.elf : dir src/raspberrypi4.ld $(OBJS)
+	$(CROSS)gcc -Wl,--build-id=none -fcommon -std=gnu99 -T src/raspberrypi4.ld -o $@ -ffreestanding -nostdlib --specs=nosys.specs $(BUILTIN_OPS) $(OBJS)
 	$(CROSS)objdump -d neneco.elf > neneco.list
+
+dir: 
+	mkdir -p $(BUILDPATH)
 
 build/%.o : src/%.S
 	$(CROSS)as $(ASMFLAGS) -c -o $@ $<
 	
 build/%.o : src/%.c
-	$(CROSS)gcc $(CFLAGS) -c -o $@ $<
+	$(CROSS)gcc $(CFLAGS) -fcommon -c -o $@ $<
 
 build/%.o : ../mmu/%.c
-	$(CROSS)gcc $(CFLAGS)  -c -o $@ $<
+	$(CROSS)gcc $(CFLAGS) -fcommon -c -o $@ $<
 
 build/%.o : ../cache/%.S
-	$(CROSS)gcc $(CFLAGS)  -c -o $@ $<
+	$(CROSS)gcc $(CFLAGS) -fcommon -c -o $@ $<
 
 build/%.o : ../musl_libc/%.c
-	$(CROSS)gcc $(CFLAGS)  -c -o $@ $<
+	$(CROSS)gcc $(CFLAGS) -fcommon -c -o $@ $<
 
 build/%.o : ../../FreeRTOS_port/%.c
-	$(CROSS)gcc $(CFLAGS)  -c -o $@ $<
+	$(CROSS)gcc $(CFLAGS) -fcommon -c -o $@ $<
 
 build/%.o : ../../FreeRTOS_port/portable/GCC/ARM_CA72_64_BIT/%.c
-	$(CROSS)gcc $(CFLAGS)  -c -o $@ $<
+	$(CROSS)gcc $(CFLAGS) -fcommon -c -o $@ $<
 
 build/%.o : ../../FreeRTOS_port/portable/GCC/ARM_CA72_64_BIT/%.S
 	$(CROSS)as $(ASMFLAGS) -c -o $@ $<
 
 build/%.o : ../../FreeRTOS_port/portable/MemMang/%.c
-	$(CROSS)gcc $(CFLAGS)  -c -o $@ $<
+	$(CROSS)gcc $(CFLAGS) -fcommon -c -o $@ $<
 
 clean :
 	rm -f build/*.o
