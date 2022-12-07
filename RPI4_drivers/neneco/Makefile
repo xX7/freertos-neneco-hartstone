@@ -12,7 +12,8 @@ CFLAGS = -mcpu=cortex-a72 \
          -I$(INCLUDEPATH2) \
          -I$(INCLUDEPATH3) \
          -I$(INCLUDEPATH4) \
-         -I$(INCLUDEPATH5) 
+         -I$(INCLUDEPATH5) \
+		 -I$(INCLUDEPATH6) 
 BUILTIN_OPS = -fno-builtin-memset
 ASMFLAGS = -mcpu=cortex-a72
 
@@ -21,6 +22,7 @@ INCLUDEPATH2 ?= ../musl_libc
 INCLUDEPATH3 ?= ../mmu
 INCLUDEPATH4 ?= ../../FreeRTOS_port/include
 INCLUDEPATH5 ?= ../../FreeRTOS_port/portable/GCC/ARM_CA72_64_BIT
+INCLUDEPATH6 ?= ../../hartstone/inc
 
 BUILDPATH := ./build
 
@@ -32,6 +34,8 @@ OBJS +=build/interrupt.o
 OBJS +=build/main.o
 OBJS +=build/mmu_cfg.o
 OBJS +=build/uart.o
+OBJS +=build/hartstone.o
+OBJS +=build/whetstone.o
 OBJS +=build/spi.o
 OBJS +=build/gpio.o
 OBJS +=build/pwm.o
@@ -95,6 +99,9 @@ build/%.o : ../../FreeRTOS_port/portable/GCC/ARM_CA72_64_BIT/%.S
 	$(CROSS)as $(ASMFLAGS) -c -o $@ $<
 
 build/%.o : ../../FreeRTOS_port/portable/MemMang/%.c
+	$(CROSS)gcc $(CFLAGS) -fcommon -c -o $@ $<
+
+build/%.o : ../../hartstone/%.c
 	$(CROSS)gcc $(CFLAGS) -fcommon -c -o $@ $<
 
 clean :

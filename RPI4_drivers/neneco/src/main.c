@@ -30,6 +30,9 @@
 #include "LN298.h"
 #include "ELM327.h"
 
+/**< Hartstone bench include*/
+#include "hartstone.h"
+
 /*
  * Prototypes for the standard FreeRTOS callback/hook functions implemented
  * within this file.
@@ -109,10 +112,13 @@ void interval_test(void){
 
 void main(void)
 {
-	uart_test();
-	interval_test();
+	//uart_test();
+	//interval_test();
 	
-	vTaskStartScheduler();
+	uart_init();
+	uart_puts("\r\n Neneco - FreeRTOS standalone\r\n");
+
+	hartstone_start();
 }
 /*-----------------------------------------------------------*/
 
