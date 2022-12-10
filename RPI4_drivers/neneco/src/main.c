@@ -31,6 +31,7 @@
 #include "ELM327.h"
 
 /**< Hartstone bench include*/
+#include "xprintf.h"
 #include "hartstone.h"
 
 /*
@@ -90,9 +91,6 @@ void interval_func(TimerHandle_t pxTimer)
 
 TaskHandle_t task_uart_test;
 void uart_test(){
-	//uart2 initialization
-	uart_init();
-
 	uart_puts("\r\n Neneco - UART unit test\r\n");
 	uart_putdec(13);
 	uart_puthex(0x30);
@@ -112,12 +110,11 @@ void interval_test(void){
 
 void main(void)
 {
-	//uart_test();
-	//interval_test();
-	
 	uart_init();
-	uart_puts("\r\n Neneco - FreeRTOS standalone\r\n");
-
+	// init xprintf output func
+	xdev_out(uart_putchar);
+	xputs("\r\n Neneco - FreeRTOS standalone\r\n");
+	
 	hartstone_start();
 }
 /*-----------------------------------------------------------*/

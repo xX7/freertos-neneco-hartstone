@@ -36,6 +36,7 @@ OBJS +=build/mmu_cfg.o
 OBJS +=build/uart.o
 OBJS +=build/hartstone.o
 OBJS +=build/whetstone.o
+OBJS +=build/xprintf.o
 OBJS +=build/spi.o
 OBJS +=build/gpio.o
 OBJS +=build/pwm.o

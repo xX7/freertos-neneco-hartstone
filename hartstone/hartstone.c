@@ -1,7 +1,6 @@
 #include <hartstone.h>
 #include <global.h>
-#include <stdio.h>
-#include "uart.h"
+#include <xprintf.h>
 
 void hartstone_raw_speed(){
 	portTickType start,stop = 0,el;
@@ -16,9 +15,6 @@ void hartstone_raw_speed(){
 		raw_speed++;
 		stop += el;
 	}
-
-	uart_puts("Raw speed in KWIPS: \r\n\r\n");
-	uart_putdec(raw_speed);
 }
 
 uint8_t total_deadline_miss(){
@@ -111,62 +107,53 @@ void hartstone_delete_taskset(uint8_t additional){
 }
 
 void hartstone_print_report(uint8_t experiment_num, uint8_t test_num,uint8_t additional){
-
-uart_puts("Experiment:  \n");
-uart_putdec(experiment_num);
-uart_puts (" - ");
-uart_putdec(test_num);
-
-/*#ifdef GUI_OUTPUT
-	printf("%d,%d,%d,%d,%d",( total_deadline_miss() > 0 || additional > MAX_ADDITIONAL_TASKS )?1:0,experiment_num,test_num,raw_speed,(N_TASK + additional));
+#ifdef GUI_OUTPUT
+	xprintf("%d,%d,%d,%d,%d",( total_deadline_miss() > 0 || additional > MAX_ADDITIONAL_TASKS )?1:0,experiment_num,test_num,raw_speed,(N_TASK + additional));
 	uint8_t k,skipped;
 	float load_p,workload;
 	for(k=0;k<(N_TASK + additional);k++){
 		load_p = ((experiment_num == 3)?load_exp3[k]:load[k]);
 		workload = 100.0 * load_p*frequency[k]/raw_speed;
-		printf(",T%d,%.2f,%.2f,%.2f,%.2f",k+1,frequency[k],load_p,load_p*frequency[k],workload);
+		xprintf(",T%d,%.2f,%.2f,%.2f,%.2f",k+1,frequency[k],load_p,load_p*frequency[k],workload);
 		if(deadline_met[k] == 0 && deadline_miss[k] == 0){
 			deadline_miss[k] = 1;
 		}
 		skipped = ((deadline_miss[k]>0)?(TEST_LEN / period[k] - deadline_met[k] - deadline_miss[k]):0);
-		printf(",%d,%d,%d,%d",period[k],deadline_met[k],deadline_miss[k],skipped);
+		xprintf(",%d,%d,%d,%d",period[k],deadline_met[k],deadline_miss[k],skipped);
 	}
-	printf(",%.2f;",hartstone_step_size(experiment_num));
+	xprintf(",%.2f;",hartstone_step_size(experiment_num));
 #else
 	uint8_t k,skipped;
 	float load_p,workload,sum=0;
 
-	uart_puts("Experiment:  \n");
-	uart_putdec(experiment_num);
-
-	printf("Experiment:\tEXPERIMENT_%d\r\n\r\n",experiment_num);
-	printf("Raw speed in KWIPS: %d\r\n\r\n",raw_speed);
-	printf("Test %d characteristics:\r\n\r\n",test_num);
-	printf("Task \t Frequency \t Kilo-Whets \t Kilo-Whets \t Requested Workload\r\n");
-	printf("No. \t (Hertz) \t per period \t per second \t Utilization\r\n");
+	xprintf("Experiment:\tEXPERIMENT_%d\r\n\r\n",experiment_num);
+	xprintf("Raw speed in KWIPS: %d\r\n\r\n",raw_speed);
+	xprintf("Test %d characteristics:\r\n\r\n",test_num);
+	xprintf("Task \t Frequency \t Kilo-Whets \t Kilo-Whets \t Requested Workload\r\n");
+	xprintf("No. \t (Hertz) \t per period \t per second \t Utilization\r\n");
 	for(k=0;k<(N_TASK + additional);k++){
 		load_p = ((experiment_num == 3)?load_exp3[k]:load[k]);
 		workload = 100.0 * load_p*frequency[k]/raw_speed;
-		printf("%d \t %.2f \t\t %.2f \t\t %.2f \t\t %.2f %% \r\n",k+1,frequency[k],load_p,load_p*frequency[k],workload);
+		xprintf("%d \t %.2f \t\t %.2f \t\t %.2f \t\t %.2f %% \r\n",k+1,frequency[k],load_p,load_p*frequency[k],workload);
 		sum += (load_p*frequency[k]);
 	}
-	printf("\t\t\t\t\t -------\t -------\r\n");
-	printf("\t\t\t\t\t %.2f \t\t %.2f %% \r\n\r\n",sum,sum*100/raw_speed);
-	printf("Experiment step size: %.2f %%\r\n",hartstone_step_size(experiment_num));
-	printf("\r\n-------------------------------------------------------\r\n");
-	printf("Test %d results:\r\n\r\n",test_num);
-	printf("Test duration (second): %d\r\n\r\n",TEST_LEN/1000);
-	printf("Task \t Period \t Met \t\t Missed \t Skipped\r\n");
-	printf("No. \t in msecs \t Deadlines \t Deadlines \t Deadlines\r\n");
+	xprintf("\t\t\t\t\t -------\t -------\r\n");
+	xprintf("\t\t\t\t\t %.2f \t\t %.2f %% \r\n\r\n",sum,sum*100/raw_speed);
+	xprintf("Experiment step size: %.2f %%\r\n",hartstone_step_size(experiment_num));
+	xprintf("\r\n-------------------------------------------------------\r\n");
+	xprintf("Test %d results:\r\n\r\n",test_num);
+	xprintf("Test duration (second): %d\r\n\r\n",TEST_LEN/1000);
+	xprintf("Task \t Period \t Met \t\t Missed \t Skipped\r\n");
+	xprintf("No. \t in msecs \t Deadlines \t Deadlines \t Deadlines\r\n");
 	for(k=0;k<(N_TASK + additional);k++){
 		if(deadline_met[k] == 0 && deadline_miss[k] == 0){
 			deadline_miss[k] = 1;
 		}
 		skipped = ((deadline_miss[k]>0)?(TEST_LEN / period[k] - deadline_met[k] - deadline_miss[k]):0);
-		printf("%d \t %d \t\t %d \t\t %d \t\t %d \r\n",k+1,period[k],deadline_met[k],deadline_miss[k],skipped);
+		xprintf("%d \t %d \t\t %d \t\t %d \t\t %d \r\n",k+1,period[k],deadline_met[k],deadline_miss[k],skipped);
 	}
-	printf("=======================================================\r\n\r\n");
-#endif*/
+	xprintf("=======================================================\r\n\r\n");
+#endif
 }
 
 float hartstone_step_size(uint8_t experiment_num){
@@ -220,29 +207,29 @@ void hartstone_error(uint8_t errorCode) {
 	switch(errorCode){
 		case 2:
 			#ifndef GUI_OUTPUT
-				//printf("Error in the task set creation");
+				xprintf("Error in the task set creation");
 			#else
-				//printf("2;");
+				xprintf("2;");
 				while(1)
-					//printf(" ");
+					xprintf(" ");
 			#endif
 			break;
 
 		case 3:
 			#ifndef GUI_OUTPUT
-				//printf("Error in delete taskset");
+				xprintf("Error in delete taskset");
 			#else
-				//printf("3;");
+				xprintf("3;");
 				while(1)
-					//printf(" ");
+					xprintf(" ");
 			#endif
 			break;
 
 		case 4:
 			#ifndef GUI_OUTPUT
-				//printf("Error ");
+				xprintf("Error ");
 			#else
-				//printf("4;");
+				xprintf("4;");
 			#endif
 			break;
 	}
