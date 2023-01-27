@@ -129,16 +129,17 @@ void hartstone_print_report(uint8_t experiment_num, uint8_t test_num,uint8_t add
 	xprintf("Experiment:\tEXPERIMENT_%d\r\n\r\n",experiment_num);
 	xprintf("Raw speed in KWIPS: %d\r\n\r\n",raw_speed);
 	xprintf("Test %d characteristics:\r\n\r\n",test_num);
-	xprintf("Task \t Frequency \t Kilo-Whets \t Kilo-Whets \t Requested Workload\r\n");
-	xprintf("No. \t (Hertz) \t per period \t per second \t Utilization\r\n");
+	xprintf("%-14s %-14s %-14s %-14s %-18s\r\n", "Task", "Frequency", "Kilo-Whets", "Kilo-Whets", "Requested Workload");
+	xprintf("%-14s %-14s %-14s %-14s %-18s\r\n", "No.", "(Herz)", "per period", "per second", "Utilization");
+
 	for(k=0;k<(N_TASK + additional);k++){
 		load_p = ((experiment_num == 3)?load_exp3[k]:load[k]);
 		workload = 100.0 * load_p*frequency[k]/raw_speed;
-		xprintf("%d \t %.2f \t\t %.2f \t\t %.2f \t\t %.2f %% \r\n",k+1,frequency[k],load_p,load_p*frequency[k],workload);
+		xprintf("%-14d %-14.2f %-14.2f %-14.2f %-5.2f%%  \r\n",k+1,frequency[k],load_p,load_p*frequency[k],workload);
 		sum += (load_p*frequency[k]);
 	}
-	xprintf("\t\t\t\t\t -------\t -------\r\n");
-	xprintf("\t\t\t\t\t %.2f \t\t %.2f %% \r\n\r\n",sum,sum*100/raw_speed);
+	xprintf("%52s %14s\r\n", "-------", "-------");
+	xprintf("%52.2f %11.2f %% \r\n\r\n",sum,sum*100/raw_speed);
 	xprintf("Experiment step size: %.2f %%\r\n",hartstone_step_size(experiment_num));
 	xprintf("\r\n-------------------------------------------------------\r\n");
 	xprintf("Test %d results:\r\n\r\n",test_num);
@@ -236,7 +237,7 @@ void hartstone_error(uint8_t errorCode) {
 }
 
 void vManagementTask( void * pvParameters ){
-	vPortTaskUsesFPU();
+	portTASK_USES_FLOATING_POINT();
 	uint8_t i = 0;
 
 #ifdef RAW_TEST
@@ -343,7 +344,7 @@ void vManagementTask( void * pvParameters ){
 
 void vGenericTask( void * pvParameters )
 {
-	vPortTaskUsesFPU();
+	portTASK_USES_FLOATING_POINT();
 	INIT_PERIODIC()
 	START_PERIODIC()
 
@@ -353,7 +354,7 @@ void vGenericTask( void * pvParameters )
 
 void vGenericTaskExp3( void * pvParameters )
 {
-	vPortTaskUsesFPU();
+	portTASK_USES_FLOATING_POINT();
 	INIT_PERIODIC()
 	START_PERIODIC()
 
