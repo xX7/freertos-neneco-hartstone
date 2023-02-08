@@ -68,11 +68,15 @@ OBJS +=build/timers.o
 
 OBJS +=build/heap_4.o
 
-neneco.elf : dir src/raspberrypi4.ld $(OBJS)
+all: neneco.elf
+
+neneco.elf: src/raspberrypi4.ld $(OBJS)
 	$(CROSS)gcc -Wl,--build-id=none -fcommon -std=gnu99 -O1 -T src/raspberrypi4.ld -o $@ -ffreestanding -nostdlib --specs=nosys.specs $(BUILTIN_OPS) $(OBJS)
 	$(CROSS)objdump -d neneco.elf > neneco.list
 
-dir: 
+$(OBJS): | $(BUILDPATH)
+
+$(BUILDPATH): 
 	mkdir -p $(BUILDPATH)
 
 build/%.o : src/%.S
@@ -110,3 +114,4 @@ clean :
 	rm -f *.elf
 	rm -f *.list
 
+.PHONY: all clean
